@@ -1,18 +1,11 @@
-
-COMPILER=GNU
-
-ifndef COMPILER
-$(error No compiler specified!)
+ifneq (,$(wildcard ./.env))
+    include ./.env
+    export
 endif
 
-SRC_DIR=./src
-
-all:
-	@$(MAKE) -C $(SRC_DIR) COMPILER=$(COMPILER)                NO_OMP=1 SUFFIX=_default
-	@$(MAKE) -C $(SRC_DIR) COMPILER=$(COMPILER) FAST_MATH=1    NO_OMP=1 SUFFIX=_relaxed
-	@$(MAKE) -C $(SRC_DIR) COMPILER=$(COMPILER) PRECISE_MATH=1 NO_OMP=1 SUFFIX=_precise
-
-.PHONY: clean
-clean:
-	$(MAKE) -C $(SRC_DIR) COMPILER=$(COMPILER) clean
-
+clang:
+	${LLVM}/bin/clang -Wall --target=riscv64-unknown-linux-gnu -march=rv64gcv -mabi=lp64d -O3  --sysroot=$(SYSROOT_DIR) --gcc-toolchain=$(GCC_TOOLCHAIN_DIR) -g --static  -c -o src/common.o src/common.c
+	${LLVM}/bin/clang -Wall --target=riscv64-unknown-linux-gnu -march=rv64gcv -mabi=lp64d -O3  --sysroot=$(SYSROOT_DIR) --gcc-toolchain=$(GCC_TOOLCHAIN_DIR) -g --static -c -o src/dummy.o src/dummy.c
+	${LLVM}/bin/clang -Wall --target=riscv64-unknown-linux-gnu -march=rv64gcv -mabi=lp64d -O3  --sysroot=$(SYSROOT_DIR) --gcc-toolchain=$(GCC_TOOLCHAIN_DIR) -g --static -c -o src/tsvc.o src/tsvc.c
+	${LLVM}/bin/clang -Wall --target=riscv64-unknown-linux-gnu -march=rv64gcv -mabi=lp64d -O3  --sysroot=$(SYSROOT_DIR) --gcc-toolchain=$(GCC_TOOLCHAIN_DIR) -g --static -o bin/clang_tsvc src/*.o -lm
+	rm -rf src/*.o

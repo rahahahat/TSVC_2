@@ -30,4 +30,3 @@ $(BIN_DIR)/tsvc_% : tsvc_%.o $(COMMON_FILES)
 
 clean :
 	rm -f *.o *.s
-
